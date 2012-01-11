@@ -1,0 +1,24 @@
+#! /usr/bin/env python
+import sys
+from base64 import b64encode
+from mimetypes import guess_type
+from argparse import ArgumentParser
+
+def convert(options):
+    mime_type = guess_type(options.file)
+    with open(options.file) as file:
+        encode = b64encode(file.read())
+    if options.o == 'img':
+        print '<img alt="" src="data:{0};base64,{1}"/>'.format(mime_type[0], encode)
+    else:
+        print "background-image: url(data:{0};base64,{1});".format(mime_type[0], encode)
+
+if __name__ == "__main__":
+    parser = ArgumentParser(prog='basejump', description='Convert images to base64 strings for HTML/CSS embedding')
+    parser.add_argument('-o', default='css', help='output type [img|css] (default: %(default)s)')
+    parser.add_argument('file', type=str, help='path to image file to be converted')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
+    options = parser.parse_args()
+    if not options.file:
+        parser.print_help()
+    convert(options)
